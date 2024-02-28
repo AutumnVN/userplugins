@@ -11,7 +11,7 @@ import { Channel } from "discord-types/general";
 export default definePlugin({
     name: "CleanChannelName",
     authors: [Devs.AutumnVN],
-    description: "remove all shit from channel names",
+    description: "remove all emoji and decor shit from channel names",
     patches: [
         {
             find: "loadAllGuildAndPrivateChannelsFromDisk(){",
@@ -23,7 +23,9 @@ export default definePlugin({
     ],
 
     cleanChannelName(channel?: Channel) {
-        if (channel) channel.name = channel.name.replace(/-?[^a-zA-Z0-9\u00C0-\u1EF9 -:]-?/ug, "");
+        if (channel) {
+            channel.name = channel.name.replace(/[^\u0020-\u007E]?\p{Extended_Pictographic}[^\u0020-\u007E]?/ug, "").replace(/-?[^\p{Letter}\u0020-\u007E]-?/ug, [2, 4].includes(channel.type) ? " " : "-").replace(/(^-|-$)/g, "");
+        }
         return channel;
     }
 });
