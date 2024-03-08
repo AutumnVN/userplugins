@@ -24,7 +24,7 @@ export default definePlugin({
 
     cleanChannelName(channel?: Channel) {
         if (channel) {
-            channel.name = channel.name.replace(/[^\u0020-\u007E]?\p{Extended_Pictographic}[^\u0020-\u007E]?/ug, "").replace(/-?[^\p{Letter}\u0020-\u007E]-?/ug, [2, 4].includes(channel.type) ? " " : "-").replace(/(^-|-$)/g, "");
+            channel.name = channel.name.normalize("NFKC").replace(/[^\u0020-\u007E]?\p{Extended_Pictographic}[^\u0020-\u007E]?/ug, "").replace(/-?[^\p{Letter}\u0020-\u007E]-?/ug, [2, 4].includes(channel.type) ? " " : "-").replace(/(^-|-$)/g, "");
         }
         return channel;
     }
