@@ -18,7 +18,7 @@ const OSU_MANIA_SMALL_IMAGE = "373370588703621136";
 const OSU_TAIKO_SMALL_IMAGE = "373370519891738624";
 const OSU_CATCH_SMALL_IMAGE = "373370543161999361";
 
-const throttledOnMessage = throttle(onMessage, 3000, () => FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null, socketId: "tosu" }));
+const throttledOnMessage = throttle(onMessage, 3000, () => FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null, socketId }));
 
 let ws: WebSocket;
 let wsReconnect: NodeJS.Timeout;
@@ -38,7 +38,7 @@ export default definePlugin({
     stop() {
         ws.close();
         clearTimeout(wsReconnect);
-        FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null, socketId: "tosu" });
+        FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null, socketId });
     }
 });
 
@@ -46,7 +46,7 @@ export default definePlugin({
 async function onMessage(data: string) {
     const json: TosuApi = JSON.parse(data);
     // @ts-ignore
-    if (json.error) return FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null, socketId: "tosu" });
+    if (json.error) return FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null, socketId });
 
     const { state, session, profile, beatmap, play, resultsScreen } = json;
 
@@ -208,7 +208,7 @@ async function onMessage(data: string) {
         activity.metadata?.button_urls?.push(profileLink);
     }
 
-    FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity, socketId: "tosu" });
+    FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity, socketId });
 }
 
 function throttle<T extends Function>(func: T, limit: number, timedOutCallback?: () => void): T {
