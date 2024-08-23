@@ -62,6 +62,10 @@ async function onMessage(data: string) {
             start: Date.now() - session.playTime
         },
         flags: 1 << 0,
+        buttons: [],
+        metadata: {
+            button_urls: []
+        }
     };
 
     switch (profile.mode.number) {
@@ -192,6 +196,16 @@ async function onMessage(data: string) {
         const mapBg = await getAsset(`https://assets.ppy.sh/beatmaps/${beatmap.set}/covers/list@2x.jpg`);
         const res = await fetch(mapBg.replace(/^mp:/, "https://media.discordapp.net/"), { method: "HEAD" });
         if (res.ok) activity.assets.large_image = mapBg;
+
+        const mapLink = `https://osu.ppy.sh/beatmapsets/${beatmap.set}#${profile.mode.name.toLowerCase()}/${beatmap.id}`;
+        activity.buttons?.push("Beatmap");
+        activity.metadata?.button_urls?.push(mapLink);
+    }
+
+    if (profile.userStatus.number === UserLoginStatus.Connected) {
+        const profileLink = `https://osu.ppy.sh/users/${profile.id}/${profile.mode.name.toLowerCase()}`;
+        activity.buttons?.push("Profile");
+        activity.metadata?.button_urls?.push(profileLink);
     }
 
     FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity, socketId: "tosu" });
