@@ -48,7 +48,7 @@ async function onMessage(data: string) {
     // @ts-ignore
     if (json.error) return FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null, socketId });
 
-    const { state, session, profile, beatmap, play, resultsScreen } = json;
+    const { state, session, profile, beatmap, play, performance, resultsScreen } = json;
 
     const activity: Activity = {
         application_id: OSU_APP_ID,
@@ -110,13 +110,13 @@ async function onMessage(data: string) {
             pp = play.hits[0] === 0 && play.hits.sliderBreaks === 0
                 ? `${Math.round(play.pp.current)}pp`
                 : `${Math.round(play.pp.current)}pp/${Math.round(play.pp.fc)}pp`;
-            activity.details = `${play.accuracy.toFixed(2)}% | ${combo} | ${pp}`;
+            activity.details = `${play.accuracy.toFixed(2)}% ${combo} ${pp}`;
 
             h100 = play.hits[100] > 0 ? `${play.hits[100]}x100` : "";
             h50 = play.hits[50] > 0 ? `${play.hits[50]}x50` : "";
             h0 = play.hits[0] > 0 ? `${play.hits[0]}xMiss` : "";
             sb = play.hits.sliderBreaks > 0 ? `${play.hits.sliderBreaks}xSB` : "";
-            activity.state = [h100, h50, h0, sb].filter(Boolean).join(" | ");
+            activity.state = [h100, h50, h0, sb].filter(Boolean).join(" ");
 
             const playRank = await getAsset(`https://raw.githubusercontent.com/AutumnVN/gosu-rich-presence/main/grade/${play.rank.current.toLowerCase().replace("x", "ss")}.png`);
             activity.assets.small_image = playRank;
@@ -128,18 +128,18 @@ async function onMessage(data: string) {
             mods = resultsScreen.mods.name ? `+${resultsScreen.mods.name} ` : "";
             activity.name = `${resultsScreen.playerName} | ${beatmap.artist} - ${beatmap.title} [${beatmap.version}] ${mods}(${beatmap.mapper}, ${beatmap.stats.stars.total.toFixed(2)}*)`;
 
-            fc = resultsScreen.maxCombo === beatmap.stats.maxCombo ? "FC" : `| ${resultsScreen.maxCombo}x/${beatmap.stats.maxCombo}x`;
+            fc = resultsScreen.maxCombo === beatmap.stats.maxCombo ? "FC" : `${resultsScreen.maxCombo}x/${beatmap.stats.maxCombo}x`;
             pp = !resultsScreen.pp.current ? ""
                 : Math.round(resultsScreen.pp.current) === Math.round(resultsScreen.pp.fc)
-                    ? `| ${Math.round(resultsScreen.pp.current)}pp`
-                    : `| ${Math.round(resultsScreen.pp.current)}pp/${Math.round(resultsScreen.pp.fc)}pp`;
+                    ? `${Math.round(resultsScreen.pp.current)}pp`
+                    : `${Math.round(resultsScreen.pp.current)}pp/${Math.round(resultsScreen.pp.fc)}pp`;
             activity.details = `${resultsScreen.accuracy.toFixed(2)}% ${fc} ${pp}`;
 
             h100 = resultsScreen.hits[100] > 0 ? `${resultsScreen.hits[100]}x100` : "";
             h50 = resultsScreen.hits[50] > 0 ? `${resultsScreen.hits[50]}x50` : "";
             h0 = resultsScreen.hits[0] > 0 ? `${resultsScreen.hits[0]}xMiss` : "";
             sb = play.hits.sliderBreaks > 0 ? `${play.hits.sliderBreaks}xSB` : "";
-            activity.state = [h100, h50, h0].filter(Boolean).join(" | ");
+            activity.state = [h100, h50, h0].filter(Boolean).join(" ");
 
             const resultRank = await getAsset(`https://raw.githubusercontent.com/AutumnVN/gosu-rich-presence/main/grade/${resultsScreen.rank.toLowerCase().replace("x", "ss")}.png`);
             activity.assets.small_image = resultRank;
@@ -173,21 +173,25 @@ async function onMessage(data: string) {
                 case GameState.Charts: activity.details = "Charts"; break;
             }
 
+            activity.details += " - ";
+
             switch (profile.banchoStatus.number) {
-                case BanchoStatusEnum.Idle: activity.state = "Idle"; break;
-                case BanchoStatusEnum.Afk: activity.state = "AFK"; break;
-                case BanchoStatusEnum.Playing: activity.state = "Playing"; break;
-                case BanchoStatusEnum.Editing: activity.state = "Editing"; break;
-                case BanchoStatusEnum.Modding: activity.state = "Modding"; break;
-                case BanchoStatusEnum.Multiplayer: activity.state = "Multiplayer"; break;
-                case BanchoStatusEnum.Watching: activity.state = "Watching"; break;
-                case BanchoStatusEnum.Testing: activity.state = "Testing"; break;
-                case BanchoStatusEnum.Submitting: activity.state = "Submitting"; break;
-                case BanchoStatusEnum.Paused: activity.state = "Paused"; break;
-                case BanchoStatusEnum.Lobby: activity.state = "Lobby"; break;
-                case BanchoStatusEnum.Multiplaying: activity.state = "Multiplaying"; break;
-                case BanchoStatusEnum.OsuDirect: activity.state = "osu!direct"; break;
+                case BanchoStatusEnum.Idle: activity.details += "Idle"; break;
+                case BanchoStatusEnum.Afk: activity.details += "AFK"; break;
+                case BanchoStatusEnum.Playing: activity.details += "Playing"; break;
+                case BanchoStatusEnum.Editing: activity.details += "Editing"; break;
+                case BanchoStatusEnum.Modding: activity.details += "Modding"; break;
+                case BanchoStatusEnum.Multiplayer: activity.details += "Multiplayer"; break;
+                case BanchoStatusEnum.Watching: activity.details += "Watching"; break;
+                case BanchoStatusEnum.Testing: activity.details += "Testing"; break;
+                case BanchoStatusEnum.Submitting: activity.details += "Submitting"; break;
+                case BanchoStatusEnum.Paused: activity.details += "Paused"; break;
+                case BanchoStatusEnum.Lobby: activity.details += "Lobby"; break;
+                case BanchoStatusEnum.Multiplaying: activity.details += "Multiplaying"; break;
+                case BanchoStatusEnum.OsuDirect: activity.details += "osu!direct"; break;
             }
+
+            activity.state = `${Math.round(performance.accuracy[100])}pp ${Math.round(performance.accuracy[99])}pp ${Math.round(performance.accuracy[98])}pp ${Math.round(performance.accuracy[97])}pp ${Math.round(performance.accuracy[96])}pp ${Math.round(performance.accuracy[95])}pp`;
 
             break;
     }
