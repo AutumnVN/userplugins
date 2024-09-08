@@ -56,7 +56,7 @@ async function onMessage(data: string) {
         type: ActivityType.PLAYING,
         assets: {
             large_image: OSU_LARGE_IMAGE,
-            large_text: profile.userStatus.number === UserLoginStatus.Connected ? `${profile.name} | #${profile.globalRank} | ${Math.round(profile.pp)}pp` : undefined,
+            large_text: profile.userStatus.number === UserLoginStatus.Connected ? `${profile.name} (#${profile.globalRank}) ${Math.round(profile.pp)}pp` : undefined,
         },
         timestamps: {
             start: Date.now() - session.playTime
