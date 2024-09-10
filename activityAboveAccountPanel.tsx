@@ -70,8 +70,7 @@ export default definePlugin({
                         style={{
                             display: "flex",
                             flexDirection: "column",
-                            gap: "5px",
-                            padding: "5px"
+                            gap: "5px"
                         }}
                     >
                         {activities.map((activity, index) =>
