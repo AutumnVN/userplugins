@@ -37,8 +37,8 @@ interface Timestamp {
 const ActivityView = findComponentByCodeLazy<{
     activity: Activity | null;
     user: User;
-    type?: string;
-}>(",onOpenGameProfileModal:");
+    currentUser: User;
+}>('location:"UserProfileActivityCard",');
 
 export default definePlugin({
     name: "ActivityAboveAccountPanel",
@@ -80,7 +80,7 @@ export default definePlugin({
                                 key={index}
                                 activity={activity}
                                 user={currentUser}
-                                type="BiteSizePopout"
+                                currentUser={currentUser}
                             />)
                         )}
                     </div>
