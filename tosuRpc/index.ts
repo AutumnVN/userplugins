@@ -59,9 +59,6 @@ async function onMessage(data: string) {
             large_image: OSU_LARGE_IMAGE,
             large_text: profile.userStatus.number === UserLoginStatus.Connected ? `${profile.name} (#${profile.globalRank}) ${Math.round(profile.pp)}pp` : undefined,
         },
-        timestamps: {
-            start: Date.now() - session.playTime
-        },
         flags: 1 << 0,
         buttons: [],
         metadata: {
@@ -119,6 +116,12 @@ async function onMessage(data: string) {
             sb = play.hits.sliderBreaks > 0 ? `${play.hits.sliderBreaks}xSB` : "";
             activity.state = [h100, h50, h0, sb].filter(Boolean).join(" ");
 
+            const lengthMultiplier = mods.includes("DT") || mods.includes("NC") ? 2 / 3 : mods.includes("HT") ? 4 / 3 : 1;
+            activity.timestamps = {
+                start: Math.round(Date.now() - beatmap.time.live * lengthMultiplier),
+                end: Math.round(Date.now() + (beatmap.time.mp3Length - beatmap.time.live) * lengthMultiplier)
+            };
+
             const playRank = await getAsset(`https://raw.githubusercontent.com/AutumnVN/gosu-rich-presence/main/grade/${play.rank.current.toLowerCase().replace("x", "ss")}.png`);
             activity.assets.small_image = playRank;
             activity.assets.small_text = undefined;
@@ -141,6 +144,11 @@ async function onMessage(data: string) {
             h0 = resultsScreen.hits[0] > 0 ? `${resultsScreen.hits[0]}xMiss` : "";
             sb = play.hits.sliderBreaks > 0 ? `${play.hits.sliderBreaks}xSB` : "";
             activity.state = [h100, h50, h0].filter(Boolean).join(" ");
+
+            activity.timestamps = {
+                start: Math.round(Date.now() - beatmap.time.live),
+                end: Math.round(Date.now() + (beatmap.time.mp3Length - beatmap.time.live))
+            };
 
             const resultRank = await getAsset(`https://raw.githubusercontent.com/AutumnVN/gosu-rich-presence/main/grade/${resultsScreen.rank.toLowerCase().replace("x", "ss")}.png`);
             activity.assets.small_image = resultRank;
@@ -193,6 +201,11 @@ async function onMessage(data: string) {
             }
 
             activity.state = `${Math.round(performance.accuracy[100])}pp ${Math.round(performance.accuracy[99])}pp ${Math.round(performance.accuracy[98])}pp ${Math.round(performance.accuracy[97])}pp ${Math.round(performance.accuracy[96])}pp ${Math.round(performance.accuracy[95])}pp`;
+
+            activity.timestamps = {
+                start: Math.round(Date.now() - beatmap.time.live),
+                end: Math.round(Date.now() + (beatmap.time.mp3Length - beatmap.time.live))
+            };
 
             break;
     }
