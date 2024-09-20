@@ -200,7 +200,7 @@ async function onMessage(data: string) {
                 case BanchoStatusEnum.OsuDirect: activity.details += "osu!direct"; break;
             }
 
-            activity.state = `${Math.round(performance.accuracy[100])}pp ${Math.round(performance.accuracy[99])}pp ${Math.round(performance.accuracy[98])}pp ${Math.round(performance.accuracy[97])}pp ${Math.round(performance.accuracy[96])}pp ${Math.round(performance.accuracy[95])}pp`;
+            activity.state = `${Math.round(performance.accuracy[100])}pp / ${Math.round(performance.accuracy[99])}pp / ${Math.round(performance.accuracy[98])}pp`;
 
             activity.timestamps = {
                 start: Math.round(Date.now() - beatmap.time.live),
