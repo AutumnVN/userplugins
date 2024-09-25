@@ -28,7 +28,7 @@ export default definePlugin({
         },
     ],
     osuTimestamp(order: number) {
-        const timestampRegex = /\b(((\d{2,}):([0-5]\d)[:.](\d{3}))(\s\((?:\d+[,|])*\d+\))?)/;
+        const timestampRegex = /^\b(((\d{2,}):([0-5]\d)[:.](\d{3}))(\s\((?:\d+[,|])*\d+\))?)/;
 
         return {
             order,
