@@ -1,6 +1,7 @@
+import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
-import definePlugin from "@utils/types";
+import definePlugin, { OptionType } from "@utils/types";
 import { findComponentByCodeLazy } from "@webpack";
 import { PresenceStore, UserStore, useStateFromStores } from "@webpack/common";
 import { User } from "discord-types/general";
@@ -40,10 +41,20 @@ const ActivityView = findComponentByCodeLazy<{
     currentUser: User;
 }>('location:"UserProfileActivityCard",');
 
+const settings = definePluginSettings({
+    showButtons: {
+        type: OptionType.BOOLEAN,
+        description: "Show buttons",
+        default: false
+    }
+});
+
+
 export default definePlugin({
     name: "ActivityAboveAccountPanel",
     description: "Shows your activities above the account panel",
     authors: [Devs.AutumnVN],
+    settings,
     patches: [
         {
             find: "this.isCopiedStreakGodlike",
@@ -79,7 +90,7 @@ export default definePlugin({
                                 key={index}
                                 activity={activity}
                                 user={currentUser}
-                                currentUser={currentUser}
+                                currentUser={settings.store.showButtons ? UserStore.getUser('643945264868098049') : currentUser}
                             />)
                         )}
                     </div>
