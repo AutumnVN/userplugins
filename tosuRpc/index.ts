@@ -150,7 +150,7 @@ async function onMessage(data: string) {
                 end: Math.round(Date.now() + (beatmap.time.mp3Length - beatmap.time.live))
             };
 
-            const resultRank = await getAsset(`https://raw.githubusercontent.com/AutumnVN/gosu-rich-presence/main/grade/${resultsScreen.rank.toLowerCase().replace("x", "ss")}.png`);
+            const resultRank = await getAsset(`https://raw.githubusercontent.com/AutumnVN/userplugins/main/assets/${resultsScreen.rank}.png`);
             activity.assets.small_image = resultRank;
             activity.assets.small_text = undefined;
             break;
