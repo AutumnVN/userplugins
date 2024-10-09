@@ -18,7 +18,7 @@ const OSU_MANIA_SMALL_IMAGE = "373370588703621136";
 const OSU_TAIKO_SMALL_IMAGE = "373370519891738624";
 const OSU_CATCH_SMALL_IMAGE = "373370543161999361";
 
-const throttledOnMessage = throttle(onMessage, 1000, () => FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null, socketId }));
+const throttledOnMessage = throttle(onMessage, 3000, () => FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null, socketId }));
 
 let ws: WebSocket;
 let wsReconnect: NodeJS.Timeout;
@@ -49,7 +49,7 @@ async function onMessage(data: string) {
     // @ts-ignore
     if (json.error) return FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null, socketId });
 
-    const { state, session, profile, beatmap, play, performance, resultsScreen } = json;
+    const { state, profile, beatmap, play, performance, resultsScreen } = json;
 
     const activity: Activity = {
         application_id: OSU_APP_ID,
