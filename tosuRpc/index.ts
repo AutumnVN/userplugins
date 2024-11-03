@@ -48,7 +48,7 @@ async function onMessage(data: string) {
     const json: TosuApi = JSON.parse(data);
     // @ts-ignore
     if (json.error) return FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null, socketId });
-    console.log(json);
+
     const { state, profile, beatmap, play, performance, resultsScreen } = json;
 
     const activity: Activity = {
@@ -122,7 +122,7 @@ async function onMessage(data: string) {
                 end: Math.round(Date.now() + (beatmap.time.mp3Length - beatmap.time.live) * lengthMultiplier)
             };
 
-            const playRank = await getAsset(`https://raw.githubusercontent.com/AutumnVN/userplugins/main/assets/${play.rank.current}.png`);
+            const playRank = await getAsset(`https://github.com/AutumnVN/userplugins/blob/main/assets/${play.rank.current}.png?raw=true`);
             activity.assets.small_image = playRank;
             activity.assets.small_text = undefined;
             break;
@@ -150,7 +150,7 @@ async function onMessage(data: string) {
                 end: Math.round(Date.now() + (beatmap.time.mp3Length - beatmap.time.live))
             };
 
-            const resultRank = await getAsset(`https://raw.githubusercontent.com/AutumnVN/userplugins/main/assets/${resultsScreen.rank}.png`);
+            const resultRank = await getAsset(`https://github.com/AutumnVN/userplugins/blob/main/assets/${resultsScreen.rank}.png?raw=true`);
             activity.assets.small_image = resultRank;
             activity.assets.small_text = undefined;
             break;
