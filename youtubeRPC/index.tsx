@@ -134,8 +134,8 @@ function requestMetadata() {
                     "artist"        : navigator.mediaSession.metadata.artist,
                     "album"         : navigator.mediaSession.metadata.album,
                     "artwork"       : navigator.mediaSession.metadata.artwork[0].src,
-                    "currentTime"   : document.querySelector('video.video-stream').currentTime,
-                    "duration"      : document.querySelector('video.video-stream').duration,
+                    "currentTime"   : document.querySelector('video.video-stream').currentTime || document.querySelectorAll('video.video-stream')[1].currentTime,
+                    "duration"      : document.querySelector('video.video-stream').duration || document.querySelectorAll('video.video-stream')[1].duration,
                     "url"           : window.location.href,
                 }
             })();`,
