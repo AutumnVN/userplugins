@@ -102,13 +102,13 @@ async function onMessage(data: string) {
             mods = play.mods.name ? `+${play.mods.name} ` : "";
             activity.name = `${player}${beatmap.artist} - ${beatmap.title} [${beatmap.version}] ${mods}(${beatmap.mapper}, ${beatmap.stats.stars.total.toFixed(2)}*)`;
 
-            combo = play.hits[0] === 0 && play.hits.sliderBreaks === 0
-                ? `${play.combo.current}x`
-                : `${play.combo.current}x/${play.combo.max}x`;
             pp = play.hits[0] === 0 && play.hits.sliderBreaks === 0
                 ? `${Math.round(play.pp.current)}pp`
                 : `${Math.round(play.pp.current)}pp/${Math.round(play.pp.fc)}pp`;
-            activity.details = `${play.accuracy.toFixed(2)}% ${combo} ${pp}`;
+            combo = play.hits[0] === 0 && play.hits.sliderBreaks === 0
+                ? `${play.combo.current}x`
+                : `${play.combo.current}x/${play.combo.max}x`;
+            activity.details = `${play.accuracy.toFixed(2)}% ${pp} ${combo}`;
 
             h100 = play.hits[100] > 0 ? `${play.hits[100]}x100` : "";
             h50 = play.hits[50] > 0 ? `${play.hits[50]}x50` : "";
@@ -132,12 +132,12 @@ async function onMessage(data: string) {
             mods = resultsScreen.mods.name ? `+${resultsScreen.mods.name} ` : "";
             activity.name = `${resultsScreen.playerName} | ${beatmap.artist} - ${beatmap.title} [${beatmap.version}] ${mods}(${beatmap.mapper}, ${beatmap.stats.stars.total.toFixed(2)}*)`;
 
-            fc = resultsScreen.maxCombo === beatmap.stats.maxCombo ? "FC" : `${resultsScreen.maxCombo}x/${beatmap.stats.maxCombo}x`;
             pp = !resultsScreen.pp.current ? ""
                 : Math.round(resultsScreen.pp.current) === Math.round(resultsScreen.pp.fc)
                     ? `${Math.round(resultsScreen.pp.current)}pp`
                     : `${Math.round(resultsScreen.pp.current)}pp/${Math.round(resultsScreen.pp.fc)}pp`;
-            activity.details = `${resultsScreen.accuracy.toFixed(2)}% ${fc} ${pp}`;
+            fc = resultsScreen.maxCombo === beatmap.stats.maxCombo ? "FC" : `${resultsScreen.maxCombo}x/${beatmap.stats.maxCombo}x`;
+            activity.details = `${resultsScreen.accuracy.toFixed(2)}% ${pp} ${fc}`;
 
             h100 = resultsScreen.hits[100] > 0 ? `${resultsScreen.hits[100]}x100` : "";
             h50 = resultsScreen.hits[50] > 0 ? `${resultsScreen.hits[50]}x50` : "";
