@@ -5,7 +5,8 @@
  */
 
 import { Devs } from "@utils/constants";
-import definePlugin from "@utils/types";
+import definePlugin, { PluginNative } from "@utils/types";
+const Native = VencordNative.pluginHelpers["osu!EditorTimestamp"] as PluginNative<typeof import("./native")>;
 
 export default definePlugin({
     name: "osu!EditorTimestamp",
@@ -25,7 +26,7 @@ export default definePlugin({
                 match: /roleMention:{type:/,
                 replace: 'osuTimestamp:{type:"inlineObject"},$&',
             }
-        },
+        }
     ],
     osuTimestamp(order: number) {
         const timestampRegex = /^\b(((\d{2,}):([0-5]\d)[:.](\d{3}))(\s\((?:\d+[,|])*\d+\))?)/;
@@ -33,7 +34,7 @@ export default definePlugin({
         return {
             order,
             requiredFirstCharacters: "0123456789".split(""),
-            match: (content) => timestampRegex.exec(content),
+            match: content => timestampRegex.exec(content),
             parse(match, _, props) {
                 if (!props.messageId) return {
                     type: "text",
@@ -45,7 +46,12 @@ export default definePlugin({
                     content: match[0],
                 };
             },
-            react: ({ content }) => <a href={`osu://edit/${content}`}>{content}</a>
+            react: ({ content }) => <a href={`osu://edit/${content}`} onClick={
+                e => {
+                    e.preventDefault();
+                    Native.openExternal(`osu://edit/${content}`);
+                }
+            }>{content}</a>
         };
     }
 });
