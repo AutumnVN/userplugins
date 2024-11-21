@@ -22,7 +22,7 @@ const throttledOnMessage = throttle(onMessage, 3000, () => FluxDispatcher.dispat
 
 let ws: WebSocket;
 let wsReconnect: NodeJS.Timeout;
-let lastBeatmapSet = 0;
+const lastBeatmapSet = 0;
 
 export default definePlugin({
     name: "TosuRPC",
@@ -212,14 +212,8 @@ async function onMessage(data: string) {
 
     if (beatmap.set > 0) {
         const mapBg = await getAsset(`https://assets.ppy.sh/beatmaps/${beatmap.set}/covers/list@2x.jpg`);
-
-        if (lastBeatmapSet !== beatmap.set) {
-            lastBeatmapSet = beatmap.set;
-            const res = await fetch(mapBg.replace(/^mp:/, "https://media.discordapp.net/"), { method: "HEAD" });
-            if (res.ok) activity.assets.large_image = mapBg;
-        } else {
-            activity.assets.large_image = mapBg;
-        }
+        const res = await fetch(mapBg.replace(/^mp:/, "https://media.discordapp.net/"), { method: "HEAD" });
+        if (res.ok) activity.assets.large_image = mapBg;
 
         const mapLink = `https://osu.ppy.sh/beatmapsets/${beatmap.set}#${profile.mode.name.toLowerCase()}/${beatmap.id}`;
         activity.buttons?.push("Beatmap");
