@@ -52,7 +52,7 @@ async function createActivity(metadata: any) {
         type: ActivityType.WATCHING,
         details: metadata.artist.replace(/ - Topic$/, ''),
         assets: {
-            large_image: await getAsset(metadata.artwork),
+            large_image: await getAsset("https://wsrv.nl/?url=" + metadata.artwork),
         },
         buttons: ["Watch on YouTube"],
         metadata: {
