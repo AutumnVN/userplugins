@@ -1,10 +1,15 @@
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2025 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
 import { findComponentByCodeLazy } from "@webpack";
 import { PresenceStore, UserStore, useStateFromStores } from "@webpack/common";
-import { User } from "discord-types/general";
 
 interface Activity {
     created_at: number;
@@ -35,11 +40,7 @@ interface Timestamp {
     start?: number;
     end?: number;
 }
-const ActivityView = findComponentByCodeLazy<{
-    activity: Activity | null;
-    user: User;
-    currentUser: User;
-}>('location:"UserProfileActivityCard",');
+const ActivityView = findComponentByCodeLazy('location:"UserProfileActivityCard",');
 
 const settings = definePluginSettings({
     showButtons: {
@@ -90,7 +91,7 @@ export default definePlugin({
                                 key={index}
                                 activity={activity}
                                 user={currentUser}
-                                currentUser={settings.store.showButtons ? UserStore.getUser('643945264868098049') : currentUser}
+                                currentUser={settings.store.showButtons ? { id: "0" } : currentUser}
                             />)
                         )}
                     </div>

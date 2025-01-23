@@ -9,7 +9,7 @@ import { ScreenshareIcon } from "@components/Icons";
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { findByPropsLazy } from "@webpack";
-import { Menu, UploadHandler, useState } from "@webpack/common";
+import { Menu, UploadHandler } from "@webpack/common";
 
 const OptionClasses = findByPropsLazy("optionName", "optionIcon", "optionLabel");
 

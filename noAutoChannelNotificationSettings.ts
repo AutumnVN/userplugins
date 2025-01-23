@@ -9,7 +9,7 @@ import definePlugin from "@utils/types";
 
 export default definePlugin({
     name: "NoAutoChannelNotificationSettings",
-    description: 'fuck you discord i didnt ask you to auto change my notification settings. "maybeAutoUpgradeChannel" huh? why dont you auto upgrade your dick instead of my channel settings',
+    description: "a",
     authors: [Devs.AutumnVN],
     patches: [
         {

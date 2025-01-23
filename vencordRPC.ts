@@ -24,7 +24,6 @@ const shiggy = "https://i.imgur.com/MgUzhs0.gif";
 const wysi = "https://i.imgur.com/uKtXde9.gif";
 
 async function getApplicationAsset(key: string): Promise<string> {
-    if (/https?:\/\/(cdn|media)\.discordapp\.(com|net)\/attachments\//.test(key)) return "mp:" + key.replace(/https?:\/\/(cdn|media)\.discordapp\.(com|net)\//, "");
     return (await ApplicationAssetUtils.fetchAssetIds(settings.store.appID!, [key]))[0];
 }
 
@@ -184,6 +183,7 @@ function isStreamLinkDisabled() {
 
 function isStreamLinkValid(value: string) {
     if (!isStreamLinkDisabled() && !/https?:\/\/(www\.)?(twitch\.tv|youtube\.com)\/\w+/.test(value)) return "Streaming link must be a valid URL.";
+    if (value && value.length > 512) return "Streaming link must be not longer than 512 characters.";
     return true;
 }
 
