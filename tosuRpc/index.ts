@@ -22,18 +22,19 @@ const throttledOnMessage = throttle(onMessage, 3000, () => FluxDispatcher.dispat
 
 let ws: WebSocket;
 let wsReconnect: NodeJS.Timeout;
-const lastBeatmapSet = 0;
 
 export default definePlugin({
     name: "TosuRPC",
     description: "osu! RPC with data from tosu",
     authors: [Devs.AutumnVN],
     start() {
-        (function connect() {
-            ws = new WebSocket("ws://localhost:24050/websocket/v2");
-            ws.onerror = () => ws.close();
-            ws.onclose = () => wsReconnect = setTimeout(connect, 5000);
-            ws.onmessage = ({ data }) => throttledOnMessage(data);
+        (async function connect() {
+            fetch("http://localhost:24050/json", { method: "HEAD" }).then(() => {
+                ws = new WebSocket("ws://localhost:24050/websocket/v2");
+                ws.onerror = () => ws.close();
+                ws.onclose = () => wsReconnect = setTimeout(connect, 5000);
+                ws.onmessage = ({ data }) => throttledOnMessage(data);
+            }).catch(() => wsReconnect = setTimeout(connect, 5000));
         })();
     },
     stop() {
