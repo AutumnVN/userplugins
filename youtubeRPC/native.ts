@@ -7,7 +7,7 @@
 import http from "node:http";
 
 const options: http.RequestOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 9222,
     path: "/json",
     method: "GET",

@@ -29,8 +29,8 @@ export default definePlugin({
     authors: [Devs.AutumnVN],
     start() {
         (async function connect() {
-            fetch("http://localhost:24050/json", { method: "HEAD" }).then(() => {
-                ws = new WebSocket("ws://localhost:24050/websocket/v2");
+            fetch("http://127.0.0.1:24050/json", { method: "HEAD" }).then(() => {
+                ws = new WebSocket("ws://127.0.0.1:24050/websocket/v2");
                 ws.onerror = () => ws.close();
                 ws.onclose = () => wsReconnect = setTimeout(connect, 5000);
                 ws.onmessage = ({ data }) => throttledOnMessage(data);
