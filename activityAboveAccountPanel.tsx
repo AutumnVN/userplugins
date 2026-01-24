@@ -40,7 +40,7 @@ interface Timestamp {
     start?: number;
     end?: number;
 }
-const ActivityView = findComponentByCodeLazy('location:"UserProfileActivityCard",');
+const ActivityView = findComponentByCodeLazy(".party?(0", "USER_PROFILE_ACTIVITY");
 
 const settings = definePluginSettings({
     showButtons: {
@@ -58,7 +58,7 @@ export default definePlugin({
     settings,
     patches: [
         {
-            find: "this.isCopiedStreakGodlike",
+            find: "#{intl::ACCOUNT_SPEAKING_WHILE_MUTED}",
             replacement: {
                 match: /(?<=\i\.jsxs?\)\()(\i),{(?=[^}]*?userTag:\i,hidePrivateData:)/,
                 replace: "$self.PanelWrapper,{VencordOriginal:$1,"
