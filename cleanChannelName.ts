@@ -6,7 +6,7 @@
 
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
-import { Channel } from "discord-types/general";
+import { Channel } from "@vencord/discord-types";
 
 export default definePlugin({
     name: "CleanChannelName",
@@ -35,9 +35,9 @@ export default definePlugin({
                 };
                 return smallCapsToNormal[match];
             })
-            .replace(/[^\u0020-\u007E]?\p{Extended_Pictographic}[^\u0020-\u007E]?/ug, "")
+            .replace(/[^\p{Letter}]*\p{Extended_Pictographic}[^\p{Letter}]*/ug, "")
             .replace(/-?[^\p{Letter}\u0020-\u007E]-?/ug, [2, 4].includes(channel.type) ? " " : "-")
-            .replace(/^[\p{Punctuation}\s]+|[\p{Punctuation}\s]+$/u, "")
+            .replace(/^[\p{Punctuation}\s]+|[\p{Punctuation}\s]+$/ug, "")
             .replace(/-+/g, "-");
 
         return channel;
