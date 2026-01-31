@@ -35,7 +35,7 @@ export default definePlugin({
                 };
                 return smallCapsToNormal[match];
             })
-            .replace(/[^\p{Letter}]*\p{Extended_Pictographic}[^\p{Letter}]*/ug, "")
+            .replace(/[^\p{Letter}\p{Number}]*\p{Extended_Pictographic}[^\p{Letter}\p{Number}]*/ug, "")
             .replace(/-?[^\p{Letter}\u0020-\u007E]-?/ug, [2, 4].includes(channel.type) ? " " : "-")
             .replace(/^[\p{Punctuation}\s]+|[\p{Punctuation}\s]+$/ug, "")
             .replace(/-+/g, "-");
