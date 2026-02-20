@@ -58,9 +58,9 @@ export default definePlugin({
     settings,
     patches: [
         {
-            find: "#{intl::ACCOUNT_SPEAKING_WHILE_MUTED}",
+            find: ".WIDGETS_RTC_UPSELL_COACHMARK)",
             replacement: {
-                match: /(?<=\i\.jsxs?\)\()(\i),{(?=[^}]*?userTag:\i,hidePrivateData:)/,
+                match: /(?<=\i\.jsxs?\)\()(\i),{(?=[^}]*?userTag:\i,occluded:)/,
                 replace: "$self.PanelWrapper,{VencordOriginal:$1,"
             }
         }
