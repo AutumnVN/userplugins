@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { isPluginEnabled } from "@api/PluginManager";
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { ApplicationAssetUtils, FluxDispatcher } from "@webpack/common";
@@ -29,6 +30,7 @@ export default definePlugin({
     authors: [Devs.AutumnVN],
     start() {
         (async function connect() {
+            if (!isPluginEnabled("TosuRPC")) return;
             fetch("http://127.0.0.1:24050/json", { method: "HEAD" }).then(() => {
                 ws = new WebSocket("ws://127.0.0.1:24050/websocket/v2");
                 ws.onerror = () => ws.close();
@@ -38,7 +40,7 @@ export default definePlugin({
         })();
     },
     stop() {
-        ws.close();
+        ws?.close();
         clearTimeout(wsReconnect);
         FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity: null, socketId });
     }

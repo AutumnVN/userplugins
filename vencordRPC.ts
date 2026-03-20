@@ -8,18 +8,16 @@ import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import { isTruthy } from "@utils/guards";
 import definePlugin, { OptionType } from "@utils/types";
+import { Channel, FluxStore } from "@vencord/discord-types";
 import { findByPropsLazy, findStoreLazy } from "@webpack";
-import { ApplicationAssetUtils, ChannelStore, FluxDispatcher, GuildStore, PresenceStore, RelationshipStore, SelectedChannelStore, SelectedGuildStore, UserStore } from "@webpack/common";
-import { FluxStore } from "@webpack/types";
-import { Channel } from "discord-types/general";
+import { ApplicationAssetUtils, ChannelStore, FluxDispatcher, GuildStore, IconUtils, PresenceStore, RelationshipStore, SelectedChannelStore, SelectedGuildStore, UserStore, VoiceStateStore } from "@webpack/common";
 
 const presenceStore = findByPropsLazy("getLocalPresence");
 const GuildMemberCountStore = findStoreLazy("GuildMemberCountStore") as FluxStore & { getMemberCount(guildId: string): number | null; };
 const ChannelMemberStore = findStoreLazy("ChannelMemberStore") as FluxStore & {
     getProps(guildId: string, channelId: string): { groups: { count: number; id: string; }[]; };
 };
-const VoiceStates = findByPropsLazy("getVoiceStatesForChannel");
-const chino = "https://i.imgur.com/Dsa2rQy.png";
+
 const shiggy = "https://i.imgur.com/MgUzhs0.gif";
 const wysi = "https://i.imgur.com/uKtXde9.gif";
 
@@ -194,21 +192,26 @@ function isTimestampDisabled() {
 // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function onlineFriendCount(): number {
+    const friendIds = RelationshipStore.getFriendIDs();
     let onlineFriends = 0;
-    const relationships = RelationshipStore.getRelationships();
-    for (const id in relationships) {
-        if (relationships[id] === 1 && PresenceStore.getStatus(id) !== "offline") onlineFriends++;
+
+    for (const id of friendIds) {
+        const status = PresenceStore.getStatus(id) ?? "offline";
+        if (status !== "offline") onlineFriends++;
     }
+
     return onlineFriends;
 }
 
 function totalFriendCount(): number {
-    return Object.values(RelationshipStore.getRelationships()).filter(r => r === 1).length;
+    return RelationshipStore.getFriendIDs().length;
 }
 
 function memberCount(): string {
     const channelId = SelectedChannelStore.getChannelId();
     const guildId = SelectedGuildStore.getGuildId();
+    if (!guildId) return "";
+
     const { groups } = ChannelMemberStore.getProps(guildId, channelId);
     const total = GuildMemberCountStore.getMemberCount(guildId);
 
@@ -225,7 +228,7 @@ function memberCount(): string {
 
 function getChannelIconURL(channel: Channel): string {
     if (channel.icon) return `https://cdn.discordapp.com/channel-icons/${channel.id}/${channel.icon}.webp?size=128`;
-    return chino;
+    return shiggy;
 }
 
 async function createActivity(): Promise<Activity | undefined> {
@@ -259,24 +262,26 @@ async function createActivity(): Promise<Activity | undefined> {
     const guildId = SelectedGuildStore.getGuildId();
     const voiceId = SelectedChannelStore.getVoiceChannelId();
     const currentUser = UserStore.getCurrentUser();
-    if (userAvatarAsSmallImage) imageSmall = currentUser.getAvatarURL(undefined, undefined, true) || chino;
+    if (userAvatarAsSmallImage) imageSmall = currentUser.getAvatarURL(undefined, undefined, true) || shiggy;
 
     if (!channelId) {
         appName = "Friends List";
         details = `${onlineFriendCount()} online / ${totalFriendCount()} total`;
         state = `${GuildStore.getGuildCount()} servers`;
-        imageBig = chino;
+        imageBig = shiggy;
     } else {
         if (channelId === "@home" || channelId === "customize-community" || channelId === "channel-browser" || channelId === "onboarding") {
             appName = channelId === "@home" ? "Server Guide" : channelId === "customize-community" ? "Channels & Roles" : channelId === "channel-browser" ? "Browse Channels" : "Onboarding";
-            const guild = GuildStore.getGuild(guildId);
-            if (guild) {
-                details = guild.name;
-                state = memberCount();
-                imageBig = guild.getIconURL(128, true) || chino;
-                if (guild.vanityURLCode) {
-                    buttonOneText = `Join ${guild.name.slice(0, 26)}`;
-                    buttonOneURL = `https://discord.gg/${guild.vanityURLCode}`;
+            if (guildId) {
+                const guild = GuildStore.getGuild(guildId);
+                if (guild) {
+                    details = guild.name;
+                    state = memberCount();
+                    imageBig = IconUtils.getGuildIconURL({ id: guild.id, icon: guild.icon, size: 128, canAnimate: true }) || shiggy;
+                    if (guild.vanityURLCode) {
+                        buttonOneText = `Join ${guild.name.slice(0, 26)}`;
+                        buttonOneURL = `https://discord.gg/${guild.vanityURLCode}`;
+                    }
                 }
             }
         } else {
@@ -288,7 +293,7 @@ async function createActivity(): Promise<Activity | undefined> {
                 appName = exposeDmsUsername ? `${recipient.username}'s DM` : "Direct Messages";
                 details = `${onlineFriendCount()} online / ${totalFriendCount()} total`;
                 state = `${GuildStore.getGuildCount()} servers`;
-                imageBig = recipient.getAvatarURL(undefined, undefined, true) || chino;
+                imageBig = recipient.getAvatarURL(undefined, undefined, true) || shiggy;
             }
 
             if (channel.isGroupDM()) {
@@ -297,15 +302,17 @@ async function createActivity(): Promise<Activity | undefined> {
                 imageBig = getChannelIconURL(channel);
             }
 
-            const guild = GuildStore.getGuild(guildId);
-            if (guild) {
-                appName = `#${channel.name}`;
-                details = guild.name;
-                state = memberCount();
-                imageBig = guild.getIconURL(128, true) || chino;
-                if (guild.vanityURLCode) {
-                    buttonOneText = `Join ${guild.name.slice(0, 31 - 5)}`;
-                    buttonOneURL = `https://discord.gg/${guild.vanityURLCode}`;
+            if (guildId) {
+                const guild = GuildStore.getGuild(guildId);
+                if (guild) {
+                    appName = `#${channel.name}`;
+                    details = guild.name;
+                    state = memberCount();
+                    imageBig = IconUtils.getGuildIconURL({ id: guild.id, icon: guild.icon, size: 128, canAnimate: true }) || shiggy;
+                    if (guild.vanityURLCode) {
+                        buttonOneText = `Join ${guild.name.slice(0, 31 - 5)}`;
+                        buttonOneURL = `https://discord.gg/${guild.vanityURLCode}`;
+                    }
                 }
             }
         }
@@ -314,7 +321,7 @@ async function createActivity(): Promise<Activity | undefined> {
     if (voiceId) {
         const voiceChannel = ChannelStore.getChannel(voiceId);
         const voiceGuild = GuildStore.getGuild(voiceChannel.guild_id);
-        const voiceMemberCount = Object.keys(VoiceStates.getVoiceStatesForChannel(voiceChannel.id)).length;
+        const voiceMemberCount = Object.keys(VoiceStateStore.getVoiceStatesForChannel(voiceChannel.id)).length;
         buttonTwoText = `🔊 ${voiceGuild.name.slice(0, 31 - 6 - voiceMemberCount.toString().length)} [${voiceMemberCount}]`;
         buttonTwoURL = `https://discordapp.com/channels/${voiceGuild.id}/${voiceChannel.id}`;
 
