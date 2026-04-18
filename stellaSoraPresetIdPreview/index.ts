@@ -26,31 +26,32 @@ async function unfurlEmbeds(urls: string[], message: Message) {
     if (!urls || urls.length === 0) return;
 
     const channel = ChannelStore.getChannel(message.channel_id);
-
-    const resp = await RestAPI.post({
-        url: Constants.Endpoints.UNFURL_EMBED_URLS,
-        body: {
-            urls
-        }
-    }).catch(e => {
-        logger.error("Failed to get embeds", e);
-    });
-
-    if (!resp?.body?.embeds || resp.body.embeds.length === 0) return;
-
-    const { embeds } = resp.body;
     const convertedEmbeds: any[] = [];
 
-    for (const embed of embeds) {
-        try {
-            const convertedEmbed = convertEmbed(channel.id, message.id, embed);
-            if (!convertedEmbed) {
-                logger.error("embed object couldn't be converted", embed);
-                continue;
+    const chunkSize = 4;
+    for (let i = 0; i < urls.length; i += chunkSize) {
+        const batch = urls.slice(i, i + chunkSize);
+        const resp = await RestAPI.post({
+            url: Constants.Endpoints.UNFURL_EMBED_URLS,
+            body: { urls: batch }
+        }).catch(e => {
+            logger.error("Failed to get embeds for batch", e);
+            return null;
+        });
+
+        if (!resp?.body?.embeds || resp.body.embeds.length === 0) continue;
+
+        for (const embed of resp.body.embeds) {
+            try {
+                const convertedEmbed = convertEmbed(channel?.id, message.id, embed);
+                if (!convertedEmbed) {
+                    logger.error("embed object couldn't be converted", embed);
+                    continue;
+                }
+                convertedEmbeds.push(convertedEmbed);
+            } catch (e) {
+                logger.error("Failed to convert embed", e);
             }
-            convertedEmbeds.push(convertedEmbed);
-        } catch (e) {
-            logger.error("Failed to convert embed", e);
         }
     }
 
