@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { isPluginEnabled } from "@api/PluginManager";
-import { Devs } from "@utils/constants";
-import definePlugin from "@utils/types";
+import { Activity, ActivityType, BanchoStatusEnum, GameState, Modes, TosuApi, UserLoginStatus } from "./type";
 import { ApplicationAssetUtils, FluxDispatcher } from "@webpack/common";
 
-import { Activity, ActivityType, BanchoStatusEnum, GameState, Modes, TosuApi, UserLoginStatus } from "./type";
+import { Devs } from "@utils/constants";
+import definePlugin from "@utils/types";
+import { isPluginEnabled } from "@api/PluginManager";
 
 const socketId = "tosu";
 const OSU_APP_ID = "367827983903490050";
@@ -228,6 +228,8 @@ async function onMessage(data: string) {
         activity.buttons?.push("Profile");
         activity.metadata?.button_urls?.push(profileLink);
     }
+
+    activity.name = activity.name.length > 128 ? activity.name.slice(0, 125) + "..." : activity.name;
 
     FluxDispatcher.dispatch({ type: "LOCAL_ACTIVITY_UPDATE", activity, socketId });
 }
