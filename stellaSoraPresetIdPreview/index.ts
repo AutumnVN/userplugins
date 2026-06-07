@@ -87,7 +87,7 @@ export default definePlugin({
         {
             find: "Message must not be a thread starter message",
             replacement: {
-                match: /renderContentOnly:\i}=\i;/,
+                match: /renderContentOnly:\i,.*?}=\i;/,
                 replace: "$&$self.addEmbeds(arguments[0].message);"
             }
         },
