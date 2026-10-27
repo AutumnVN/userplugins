@@ -9,7 +9,7 @@ import { Devs } from "@utils/constants";
 import { sendMessage } from "@utils/discord";
 import definePlugin from "@utils/types";
 import { type Message } from "@vencord/discord-types";
-import { ChannelStore, Toasts, UserStore } from "@webpack/common";
+import { ChannelStore, showToast, UserStore } from "@webpack/common";
 
 export default definePlugin({
     name: "counter",
@@ -37,10 +37,10 @@ export default definePlugin({
                     const content = String(parseInt(message.content) + 1);
 
                     sendMessage(channel.id, { content }, true).catch(() => {
-                        Toasts.show({
-                            message: "Failed to send message",
-                            type: Toasts.Type.FAILURE,
-                            id: Toasts.genId()
+                        showToast({
+                            text: "Failed to send message",
+                            position: "bottom",
+                            variant: "critical"
                         });
                     });
                 }
