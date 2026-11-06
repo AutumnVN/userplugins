@@ -22,6 +22,32 @@ function extractBuildIdFromUrl(url?: string) {
     return parts.length > 1 ? parts[1] : url;
 }
 
+function isValidPresetId(presetId: string) {
+    const normalized = presetId
+        .replace(/\s+/g, "")
+        .replace(/-/g, "+")
+        .replace(/_/g, "/");
+
+    if (normalized.length !== 36 || !/^[A-Za-z0-9+/]+$/.test(normalized)) return false;
+
+    let bytes: Uint8Array;
+    try {
+        bytes = Uint8Array.from(atob(normalized), c => c.charCodeAt(0));
+    } catch {
+        return false;
+    }
+
+    if (bytes.length !== 27) return false;
+
+    for (let i = 0; i < 3; i++) {
+        const offset = i * 4;
+        const charId = ((bytes[offset] << 24) | (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3]) >>> 0;
+        if (charId === 0) return false;
+    }
+
+    return true;
+}
+
 async function unfurlEmbeds(urls: string[], message: Message) {
     if (!urls || urls.length === 0) return;
 
@@ -96,9 +122,9 @@ export default definePlugin({
     addEmbeds(message: Message) {
         if (!message.content) return;
 
-        const presetIdRegex = /\b(AAAA[A-Za-z0-9+/=]{20,50})/g;
+        const presetIdRegex = /\b(AAAA[A-Za-z0-9+/]{32})(?![A-Za-z0-9+/=])/g;
         const matches = message.content.match(presetIdRegex) || [];
-        const ids = Array.from(new Set(matches));
+        const ids = Array.from(new Set(matches.filter(isValidPresetId)));
 
         if (ids.length === 0) return;
 
